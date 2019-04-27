@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Plugin Name:       WP2Static Add-on: GitHub
+ * Plugin Name:       WP2Static Add-on: Netlify
  * Plugin URI:        https://wp2static.com
- * Description:       AWS GitHub as a deployment option for WP2Static.
+ * Description:       AWS Netlify as a deployment option for WP2Static.
  * Version:           0.1
  * Author:            Leon Stafford
- * Author URI:        https://leonstafford.github.io
+ * Author URI:        https://leonstafford.netlify.io
  * License:           Unlicense
  * License URI:       http://unlicense.org
- * Text Domain:       wp2static-addon-github
+ * Text Domain:       wp2static-addon-netlify
  * Domain Path:       /languages
  */
 
@@ -26,24 +26,24 @@ $wp2static_core_dir =
 
 $add_on_dir = dirname( __FILE__ );
 
-if ( $ajax_action == 'test_github' ) {
+if ( $ajax_action == 'test_netlify' ) {
     require_once $wp2static_core_dir .
         '/plugin/WP2Static/SitePublisher.php';
-    require_once $add_on_dir . '/GitHub.php';
+    require_once $add_on_dir . '/Netlify.php';
 
     wp_die();
     return null;
-} elseif ( $ajax_action == 'github_prepare_export' ) {
+} elseif ( $ajax_action == 'netlify_prepare_export' ) {
     require_once $wp2static_core_dir .
         '/plugin/WP2Static/SitePublisher.php';
-    require_once $add_on_dir . '/GitHub.php';
+    require_once $add_on_dir . '/Netlify.php';
 
     wp_die();
     return null;
-} elseif ( $ajax_action == 'github_upload_files' ) {
+} elseif ( $ajax_action == 'netlify_upload_files' ) {
     require_once $wp2static_core_dir .
         '/plugin/WP2Static/SitePublisher.php';
-    require_once $add_on_dir . '/GitHub.php';
+    require_once $add_on_dir . '/Netlify.php';
 
     wp_die();
     return null;
@@ -51,14 +51,14 @@ if ( $ajax_action == 'test_github' ) {
 
 define( 'PLUGIN_NAME_VERSION', '0.1' );
 
-require plugin_dir_path( __FILE__ ) . 'includes/class-wp2static-addon-github.php';
+require plugin_dir_path( __FILE__ ) . 'includes/class-wp2static-addon-netlify.php';
 
-function run_wp2static_addon_github() {
+function run_wp2static_addon_netlify() {
 
-	$plugin = new Wp2static_Addon_GitHub();
+	$plugin = new Wp2static_Addon_Netlify();
 	$plugin->run();
 
 }
 
-run_wp2static_addon_github();
+run_wp2static_addon_netlify();
 

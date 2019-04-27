@@ -1,6 +1,6 @@
 <?php
 
-class Wp2static_Addon_GitHub_Loader {
+class Wp2static_Addon_Netlify_Loader {
 
 	protected $actions;
 	protected $filters;

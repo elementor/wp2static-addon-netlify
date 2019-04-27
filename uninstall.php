@@ -17,12 +17,12 @@
  * general skeleton and outline for how the file should work.
  *
  * For more information, see the following discussion:
- * https://github.com/tommcfarlin/WordPress-Plugin-Boilerplate/pull/123#issuecomment-28541913
+ * https://netlify.com/tommcfarlin/WordPress-Plugin-Boilerplate/pull/123#issuecomment-28541913
  *
- * @link       https://leonstafford.github.io
+ * @link       https://leonstafford.netlify.io
  * @since      1.0.0
  *
- * @package    Wp2static_Addon_GitHub
+ * @package    Wp2static_Addon_Netlify
  */
 
 // If uninstall not called from WordPress, then exit.

@@ -1,6 +1,6 @@
 <?php
 
-class Wp2static_Addon_GitHub {
+class Wp2static_Addon_Netlify {
 
 	protected $loader;
 	protected $plugin_name;
@@ -12,21 +12,21 @@ class Wp2static_Addon_GitHub {
 		} else {
 			$this->version = '1.0.0';
 		}
-		$this->plugin_name = 'wp2static-addon-github';
+		$this->plugin_name = 'wp2static-addon-netlify';
 
 		$this->load_dependencies();
 		$this->define_admin_hooks();
 	}
 
 	private function load_dependencies() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp2static-addon-github-loader.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-wp2static-addon-github-admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp2static-addon-netlify-loader.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-wp2static-addon-netlify-admin.php';
 
-		$this->loader = new Wp2static_Addon_GitHub_Loader();
+		$this->loader = new Wp2static_Addon_Netlify_Loader();
 	}
 
 	private function define_admin_hooks() {
-		$plugin_admin = new Wp2static_Addon_GitHub_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Wp2static_Addon_Netlify_Admin( $this->get_plugin_name(), $this->get_version() );
 
         if ( isset( $_GET['page'] ) && ( $_GET['page'] == 'wp2static')) {
             $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -34,20 +34,20 @@ class Wp2static_Addon_GitHub {
 	}
 
     public function add_deployment_option_to_ui( $deploy_options ) {
-        $deploy_options['github'] = array('GitHub');
+        $deploy_options['netlify'] = array('Netlify');
 
         return $deploy_options;
     }
 
     public function load_deployment_option_template( $templates ) {
-        $templates[] =  __DIR__ . '/../views/github_settings_block.phtml';
+        $templates[] =  __DIR__ . '/../views/netlify_settings_block.phtml';
 
         return $templates;
     }
 
     public function add_deployment_option_keys( $keys ) {
         $new_keys = array(
-            'baseUrl-github',
+            'baseUrl-netlify',
             'ghBranch',
             'ghPath',
             'ghToken',
@@ -65,7 +65,7 @@ class Wp2static_Addon_GitHub {
 
     public function whitelist_deployment_option_keys( $keys ) {
         $whitelist_keys = array(
-            'baseUrl-github',
+            'baseUrl-netlify',
             'ghBranch',
             'ghPath',
             'ghToken',
@@ -82,8 +82,8 @@ class Wp2static_Addon_GitHub {
     }
 
     public function add_post_and_db_keys( $keys ) {
-        $keys['github'] = array(
-            'baseUrl-github',
+        $keys['netlify'] = array(
+            'baseUrl-netlify',
             'ghBranch',
             'ghPath',
             'ghToken',

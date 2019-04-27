@@ -1,12 +1,12 @@
 <?php
 
-class WP2Static_GitHub extends WP2Static_SitePublisher {
+class WP2Static_Netlify extends WP2Static_SitePublisher {
 
     public function __construct() {
         $deploy_keys = array(
-          'github',
+          'netlify',
           array(
-            'baseUrl-github',
+            'baseUrl-netlify',
             'ghBranch',
             'ghCommitMessage',
             'ghPath',
@@ -15,7 +15,7 @@ class WP2Static_GitHub extends WP2Static_SitePublisher {
           ),
         );
 
-        $this->loadSettings( 'github', $deploy_keys );
+        $this->loadSettings( 'netlify', $deploy_keys );
 
         $this->wp2static_core_dir =
             dirname( __FILE__ ) . '/../static-html-output-plugin';
@@ -25,7 +25,7 @@ class WP2Static_GitHub extends WP2Static_SitePublisher {
             $this->settings['ghRepo']
         );
 
-        $this->api_base = 'https://api.github.com/repos/';
+        $this->api_base = 'https://api.netlify.com/repos/';
 
         $this->previous_hashes_path =
             $this->settings['wp_uploads_path'] .
@@ -35,17 +35,17 @@ class WP2Static_GitHub extends WP2Static_SitePublisher {
             return; }
 
         switch ( $_POST['ajax_action'] ) {
-            case 'github_prepare_export':
+            case 'netlify_prepare_export':
                 $this->bootstrap();
                 $this->loadArchive();
                 $this->prepareDeploy( true );
                 break;
-            case 'github_upload_files':
+            case 'netlify_upload_files':
                 $this->bootstrap();
                 $this->loadArchive();
                 $this->upload_files();
                 break;
-            case 'test_github':
+            case 'test_netlify':
                 $this->test_upload();
                 break;
         }
@@ -83,7 +83,7 @@ class WP2Static_GitHub extends WP2Static_SitePublisher {
             }
 
             $this->logAction(
-                "Uploading {$local_file} to {$this->target_path} in GitHub"
+                "Uploading {$local_file} to {$this->target_path} in Netlify"
             );
 
             $this->local_file_contents = file_get_contents( $local_file );
@@ -93,10 +93,10 @@ class WP2Static_GitHub extends WP2Static_SitePublisher {
                 $current = crc32( $this->local_file_contents );
 
                 if ( $prev != $current ) {
-                    if ( $this->fileExistsInGitHub() ) {
-                        $this->updateFileInGitHub();
+                    if ( $this->fileExistsInNetlify() ) {
+                        $this->updateFileInNetlify();
                     } else {
-                        $this->createFileInGitHub();
+                        $this->createFileInNetlify();
                     }
 
                     $this->recordFilePathAndHashInMemory(
@@ -110,10 +110,10 @@ class WP2Static_GitHub extends WP2Static_SitePublisher {
                     );
                 }
             } else {
-                if ( $this->fileExistsInGitHub() ) {
-                    $this->updateFileInGitHub();
+                if ( $this->fileExistsInNetlify() ) {
+                    $this->updateFileInNetlify();
                 } else {
-                    $this->createFileInGitHub();
+                    $this->createFileInNetlify();
                 }
 
                 $this->recordFilePathAndHashInMemory(
@@ -194,7 +194,7 @@ class WP2Static_GitHub extends WP2Static_SitePublisher {
                     'BAD RESPONSE STATUS (' . $status_code . '): '
                 );
 
-                throw new Exception( 'GitHub API bad response status' );
+                throw new Exception( 'Netlify API bad response status' );
             }
         } catch ( Exception $e ) {
             require_once $this->wp2static_core_dir .
@@ -211,7 +211,7 @@ class WP2Static_GitHub extends WP2Static_SitePublisher {
         }
     }
 
-    public function fileExistsInGitHub() {
+    public function fileExistsInNetlify() {
         $this->remote_path = $this->api_base . $this->settings['ghRepo'] .
             '/contents/' . $this->target_path;
         // GraphQL query to get sha of existing file
@@ -243,7 +243,7 @@ JSON;
         );
 
         $this->client->postWithJSONPayloadCustomHeaders(
-            'https://api.github.com/graphql',
+            'https://api.netlify.com/graphql',
             $post_options,
             $headers,
             $curl_options = array(
@@ -268,14 +268,14 @@ JSON;
         $commit_message = '';
 
         if ( ! empty( $this->existing_file_object ) ) {
-            $this->logAction( "{$this->target_path} path exists in GitHub" );
+            $this->logAction( "{$this->target_path} path exists in Netlify" );
 
             return true;
         }
     }
 
-    public function updateFileInGitHub() {
-        $this->logAction( "Updating {$this->target_path} in GitHub" );
+    public function updateFileInNetlify() {
+        $this->logAction( "Updating {$this->target_path} in Netlify" );
 
         $action = 'UPDATE';
         $existing_sha = $this->existing_file_object['oid'];
@@ -337,8 +337,8 @@ JSON;
         }
     }
 
-    public function createFileInGitHub() {
-        $this->logAction( "Creating {$this->target_path} in GitHub" );
+    public function createFileInNetlify() {
+        $this->logAction( "Creating {$this->target_path} in Netlify" );
 
         $action = 'CREATE';
 
@@ -399,4 +399,4 @@ JSON;
     }
 }
 
-$github = new WP2Static_GitHub();
+$netlify = new WP2Static_Netlify();
