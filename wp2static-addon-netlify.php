@@ -6,7 +6,7 @@
  * Description:       AWS Netlify as a deployment option for WP2Static.
  * Version:           0.1
  * Author:            Leon Stafford
- * Author URI:        https://leonstafford.netlify.io
+ * Author URI:        https://ljs.dev
  * License:           Unlicense
  * License URI:       http://unlicense.org
  * Text Domain:       wp2static-addon-netlify
