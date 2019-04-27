@@ -33,14 +33,7 @@ if ( $ajax_action == 'test_netlify' ) {
 
     wp_die();
     return null;
-} elseif ( $ajax_action == 'netlify_prepare_export' ) {
-    require_once $wp2static_core_dir .
-        '/plugin/WP2Static/SitePublisher.php';
-    require_once $add_on_dir . '/Netlify.php';
-
-    wp_die();
-    return null;
-} elseif ( $ajax_action == 'netlify_upload_files' ) {
+} elseif ( $ajax_action == 'netlify_do_export' ) {
     require_once $wp2static_core_dir .
         '/plugin/WP2Static/SitePublisher.php';
     require_once $add_on_dir . '/Netlify.php';
