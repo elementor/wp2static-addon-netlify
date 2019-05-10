@@ -5,40 +5,17 @@ namespace WP2Static;
 class Netlify extends SitePublisher {
 
     public function __construct() {
-        $deploy_keys = array(
-          'netlify',
-          array(
-            'baseUrl-netlify',
-            'netlifyHeaders',
-            'netlifyPersonalAccessToken',
-            'netlifyRedirects',
-            'netlifySiteID',
-          ),
-        );
+        // TODO: race condition in getting filtered options back
+        // use static method to access options, checking for an instance
+        // ie Option::getOption('netlifySiteID');
+        $plugin = Controller::getInstance();
 
-        $this->loadSettings( 'netlify', $deploy_keys );
-
-        $this->settings['netlifySiteID'];
-        $this->settings['netlifyPersonalAccessToken'];
+        error_log($plugin->options->getOption( 'netlifySiteID' ));
+        die();
 
         $this->base_url = 'https://api.netlify.com';
 
         $this->detectSiteID();
-
-        if ( defined( 'WP_CLI' ) ) {
-            return; }
-
-        switch ( $_POST['ajax_action'] ) {
-            case 'test_netlify':
-                $this->loadArchive();
-                $this->test_netlify();
-                break;
-            case 'netlify_do_export':
-                $this->bootstrap();
-                $this->loadArchive();
-                $this->deploy();
-                break;
-        }
     }
 
     public function detectSiteID() {
@@ -56,8 +33,8 @@ class Netlify extends SitePublisher {
     }
 
     public function deploy() {
-        $this->zip_archive_path = $this->settings['wp_uploads_path'] . '/' .
-            $this->archive->name . '.zip';
+        $this->zip_archive_path = SiteInfo::getPath('uploads') .
+            'wp2static-exported-site.zip';
 
         $zip_deploy_endpoint = $this->base_url . '/api/v1/sites/' .
             $this->site_id . '/deploys';
@@ -89,11 +66,10 @@ class Netlify extends SitePublisher {
     }
 
     public function test_netlify() {
-        $this->zip_archive_path = $this->settings['wp_uploads_path'] . '/' .
-            $this->archive->name . '.zip';
-
         $site_info_endpoint = $this->base_url . '/api/v1/sites/' .
             $this->site_id;
+
+        error_log($site_info_endpoint);
 
         try {
 
@@ -104,7 +80,7 @@ class Netlify extends SitePublisher {
 
             $this->client = new Request();
 
-            $this->client->getWithCustomHeaders(
+            $status_code = $this->client->getWithCustomHeaders(
                 $site_info_endpoint,
                 $headers
             );
@@ -115,15 +91,14 @@ class Netlify extends SitePublisher {
                     echo 'SUCCESS';
                 }
             } else {
-                $code = 404;
-
                 WsLog::l(
-                    'BAD RESPONSE STATUS FROM API (' . $code . ')'
+                    'BAD RESPONSE CODE FROM API (' . $status_code . ')'
                 );
 
                 http_response_code( $code );
 
                 echo 'Netlify test error';
+                wp_die();
             }
         } catch ( Exception $e ) {
             $this->handleException( $e );

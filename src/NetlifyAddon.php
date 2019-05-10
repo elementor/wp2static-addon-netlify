@@ -27,6 +27,7 @@ class NetlifyAddon {
     }
 
     public function add_deployment_option_keys( $keys ) {
+        error_log('adding netlify keys');
         $new_keys = array(
             'baseUrl-netlify',
             'netlifyHeaders',
@@ -40,7 +41,7 @@ class NetlifyAddon {
             $new_keys
         );
 
-        return $keys;
+       return $keys;
     }
 
     public function whitelist_deployment_option_keys( $keys ) {
@@ -70,6 +71,7 @@ class NetlifyAddon {
 
         return $keys;
     }
+
 
 	public function run() {
         add_filter(
