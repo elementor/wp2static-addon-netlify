@@ -69,9 +69,7 @@ class Netlify extends SitePublisher {
                 'Content-Type: application/zip',
             );
 
-            require_once dirname( __FILE__ ) .
-                '/../WP2Static/Request.php';
-            $this->client = new WP2Static_Request();
+            $this->client = new Request();
 
             $this->client->postWithFileStreamAndHeaders(
                 $zip_deploy_endpoint,
@@ -104,9 +102,7 @@ class Netlify extends SitePublisher {
                     $this->settings['netlifyPersonalAccessToken'],
             );
 
-            require_once dirname( __FILE__ ) .
-                '/../WP2Static/Request.php';
-            $this->client = new WP2Static_Request();
+            $this->client = new Request();
 
             $this->client->getWithCustomHeaders(
                 $site_info_endpoint,
@@ -121,8 +117,6 @@ class Netlify extends SitePublisher {
             } else {
                 $code = 404;
 
-                require_once dirname( __FILE__ ) .
-                    '/../WP2Static/WsLog.php';
                 WsLog::l(
                     'BAD RESPONSE STATUS FROM API (' . $code . ')'
                 );
@@ -137,4 +131,4 @@ class Netlify extends SitePublisher {
     }
 }
 
-$netlify = new WP2Static_Netlify();
+$netlify = new Netlify();

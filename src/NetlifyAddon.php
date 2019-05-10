@@ -1,31 +1,17 @@
 <?php
 
-namespace WPStatic;
+namespace WP2Static;
 
-class NetlifyAddOn {
-
-	protected $loader;
-	protected $plugin_name;
-	protected $version;
+class NetlifyAddon {
 
 	public function __construct() {
 		if ( defined( 'PLUGIN_NAME_VERSION' ) ) {
 			$this->version = PLUGIN_NAME_VERSION;
 		} else {
-			$this->version = '1.0.0';
+			$this->version = '0.1';
 		}
+
 		$this->plugin_name = 'wp2static-addon-netlify';
-
-		$this->load_dependencies();
-		$this->define_admin_hooks();
-	}
-
-	private function define_admin_hooks() {
-		$plugin_admin = new Wp2static_Addon_Netlify_Admin( $this->get_plugin_name(), $this->get_version() );
-
-        if ( isset( $_GET['page'] ) && ( $_GET['page'] == 'wp2static')) {
-            $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-        }
 	}
 
     public function add_deployment_option_to_ui( $deploy_options ) {
@@ -86,8 +72,6 @@ class NetlifyAddOn {
     }
 
 	public function run() {
-		$this->loader->run();
-
         add_filter(
             'wp2static_add_deployment_method_option_to_ui',
             [$this, 'add_deployment_option_to_ui']
@@ -112,17 +96,5 @@ class NetlifyAddOn {
             'wp2static_add_post_and_db_keys',
             [$this, 'add_post_and_db_keys']
         );
-	}
-
-	public function get_plugin_name() {
-		return $this->plugin_name;
-	}
-
-	public function get_loader() {
-		return $this->loader;
-	}
-
-	public function get_version() {
-		return $this->version;
 	}
 }

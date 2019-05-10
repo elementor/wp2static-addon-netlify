@@ -21,13 +21,11 @@ define( 'WP2STATIC_NETLIFY_PATH', plugin_dir_path( __FILE__ ) );
 
 require WP2STATIC_NETLIFY_PATH . 'vendor/autoload.php';
 
-WP2Static\Netlify::init( __FILE__ );
-
 define( 'PLUGIN_NAME_VERSION', '0.1' );
 
 function run_wp2static_addon_netlify() {
 
-	$plugin = new Wp2static_Addon_Netlify();
+	$plugin = new WP2Static\NetlifyAddon();
 	$plugin->run();
 
 }
