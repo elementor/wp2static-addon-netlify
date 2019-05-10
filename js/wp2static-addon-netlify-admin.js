@@ -4,8 +4,7 @@
 	$(function() {
     deploy_options['netlify'] = {
         exportSteps: [
-            'netlify_prepare_export',
-            'netlify_upload_files',
+            'netlify_do_export',
             'finalize_deployment'
         ],
         required_fields: {

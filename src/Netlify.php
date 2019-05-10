@@ -10,39 +10,47 @@ class Netlify extends SitePublisher {
         // ie Option::getOption('netlifySiteID');
         $plugin = Controller::getInstance();
 
-        error_log($plugin->options->getOption( 'netlifySiteID' ));
-        die();
-
         $this->base_url = 'https://api.netlify.com';
 
-        $this->detectSiteID();
+        $this->site_id =
+            $this->detectSiteID(
+                $plugin->options->getOption( 'netlifySiteID' )
+            );
+
+        $this->access_token =
+            $plugin->options->getOption( 'netlifyPersonalAccessToken' );
     }
 
-    public function detectSiteID() {
-        $this->site_id = $this->settings['netlifySiteID'];
-
-        if ( strpos( $this->site_id, 'netlify.com' ) !== false ) {
-            return;
-        } elseif ( strpos( $this->site_id, '.' ) !== false ) {
-            return;
-        } elseif ( strlen( $this->site_id ) === 37 ) {
+    public function detectSiteID( $site_id ) {
+        if ( strpos( $site_id, 'netlify.com' ) !== false ) {
+            return $site_id;
+        } elseif ( strpos( $site_id, '.' ) !== false ) {
+            return $site_id;
+        } elseif ( strlen( $site_id ) === 37 ) {
             return;
         } else {
-            $this->site_id .= '.netlify.com';
+            return $site_id .= '.netlify.com';
         }
     }
 
     public function deploy() {
+        WsLog::l('Deploying to Netlify');
+
         $this->zip_archive_path = SiteInfo::getPath('uploads') .
             'wp2static-exported-site.zip';
+
+        $zip_size = filesize( $this->zip_archive_path );
+
+        $zip_size = number_format( $zip_size / 1048576, 2) . ' MB';
+
+        WsLog::l("ZIP size: {$zip_size}");
 
         $zip_deploy_endpoint = $this->base_url . '/api/v1/sites/' .
             $this->site_id . '/deploys';
 
         try {
             $headers = array(
-                'Authorization: Bearer ' .
-                    $this->settings['netlifyPersonalAccessToken'],
+                'Authorization: Bearer ' . $this->access_token,
                 'Content-Type: application/zip',
             );
 
@@ -69,14 +77,9 @@ class Netlify extends SitePublisher {
         $site_info_endpoint = $this->base_url . '/api/v1/sites/' .
             $this->site_id;
 
-        error_log($site_info_endpoint);
-
         try {
 
-            $headers = array(
-                'Authorization: Bearer ' .
-                    $this->settings['netlifyPersonalAccessToken'],
-            );
+            $headers = array( 'Authorization: Bearer ' . $this->access_token );
 
             $this->client = new Request();
 

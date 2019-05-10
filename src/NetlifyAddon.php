@@ -27,7 +27,6 @@ class NetlifyAddon {
     }
 
     public function add_deployment_option_keys( $keys ) {
-        error_log('adding netlify keys');
         $new_keys = array(
             'baseUrl-netlify',
             'netlifyHeaders',
@@ -74,6 +73,14 @@ class NetlifyAddon {
 
 
 	public function run() {
+		wp_enqueue_script(
+            $this->plugin_name,
+            plugin_dir_url( __FILE__ ) .
+                '../js/wp2static-addon-netlify-admin.js',
+            array( 'jquery' ),
+            $this->version, false
+        );
+
         add_filter(
             'wp2static_add_deployment_method_option_to_ui',
             [$this, 'add_deployment_option_to_ui']
