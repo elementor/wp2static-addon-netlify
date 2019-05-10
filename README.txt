@@ -8,11 +8,11 @@ Stable tag: 0.1
 License: Unlicense
 License URI: http://unlicense.org
 
-Adds AWS Netlify as a deployment option for WP2Static.
+Adds Netlify as a deployment option for WP2Static.
 
 == Description ==
 
-Take advantage of the Netlify and optionally CloudFront to host your WordPress
+Take advantage of the Netlify to host your WordPress
  powered static website.
 
 == Installation ==
