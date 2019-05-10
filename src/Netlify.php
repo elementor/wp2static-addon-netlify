@@ -1,6 +1,8 @@
 <?php
 
-class WP2Static_Netlify extends WP2Static_SitePublisher {
+namespace WP2Static;
+
+class Netlify extends SitePublisher {
 
     public function __construct() {
         $deploy_keys = array(
@@ -18,6 +20,7 @@ class WP2Static_Netlify extends WP2Static_SitePublisher {
 
         $this->settings['netlifySiteID'];
         $this->settings['netlifyPersonalAccessToken'];
+
         $this->base_url = 'https://api.netlify.com';
 
         $this->detectSiteID();

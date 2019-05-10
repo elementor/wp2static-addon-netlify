@@ -1,6 +1,8 @@
 <?php
 
-class Wp2static_Addon_Netlify_Admin {
+namespace WP2Static;
+
+class NetlifyAdmin {
 
 	private $plugin_name;
 	private $version;
@@ -12,6 +14,6 @@ class Wp2static_Addon_Netlify_Admin {
 	}
 
 	public function enqueue_scripts() {
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp2static-addon-netlify-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( WP2STATIC_NETLIFY_PATH . 'js/wp2static-addon-netlify-admin.js', array( 'jquery' ), $this->version, false );
 	}
 }

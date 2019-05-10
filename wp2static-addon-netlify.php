@@ -17,34 +17,13 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-// @codingStandardsIgnoreStart
-$ajax_action = isset( $_POST['ajax_action'] ) ? $_POST['ajax_action'] : '';
-// @codingStandardsIgnoreEnd
+define( 'WP2STATIC_NETLIFY_PATH', plugin_dir_path( __FILE__ ) );
 
-$wp2static_core_dir =
-    dirname( __FILE__ ) . '/../static-html-output-plugin';
+require WP2STATIC_NETLIFY_PATH . 'vendor/autoload.php';
 
-$add_on_dir = dirname( __FILE__ );
-
-if ( $ajax_action == 'test_netlify' ) {
-    require_once $wp2static_core_dir .
-        '/plugin/WP2Static/SitePublisher.php';
-    require_once $add_on_dir . '/Netlify.php';
-
-    wp_die();
-    return null;
-} elseif ( $ajax_action == 'netlify_do_export' ) {
-    require_once $wp2static_core_dir .
-        '/plugin/WP2Static/SitePublisher.php';
-    require_once $add_on_dir . '/Netlify.php';
-
-    wp_die();
-    return null;
-}
+WP2Static\Netlify::init( __FILE__ );
 
 define( 'PLUGIN_NAME_VERSION', '0.1' );
-
-require plugin_dir_path( __FILE__ ) . 'includes/class-wp2static-addon-netlify.php';
 
 function run_wp2static_addon_netlify() {
 

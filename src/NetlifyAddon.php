@@ -1,6 +1,8 @@
 <?php
 
-class Wp2static_Addon_Netlify {
+namespace WPStatic;
+
+class NetlifyAddOn {
 
 	protected $loader;
 	protected $plugin_name;
@@ -16,13 +18,6 @@ class Wp2static_Addon_Netlify {
 
 		$this->load_dependencies();
 		$this->define_admin_hooks();
-	}
-
-	private function load_dependencies() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp2static-addon-netlify-loader.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-wp2static-addon-netlify-admin.php';
-
-		$this->loader = new Wp2static_Addon_Netlify_Loader();
 	}
 
 	private function define_admin_hooks() {
@@ -48,11 +43,10 @@ class Wp2static_Addon_Netlify {
     public function add_deployment_option_keys( $keys ) {
         $new_keys = array(
             'baseUrl-netlify',
-            'ghBranch',
-            'ghPath',
-            'ghToken',
-            'ghRepo',
-            'ghCommitMessage',
+            'netlifyHeaders',
+            'netlifyPersonalAccessToken',
+            'netlifyRedirects',
+            'netlifySiteID',
         );
 
         $keys = array_merge(
@@ -66,11 +60,9 @@ class Wp2static_Addon_Netlify {
     public function whitelist_deployment_option_keys( $keys ) {
         $whitelist_keys = array(
             'baseUrl-netlify',
-            'ghBranch',
-            'ghPath',
-            'ghToken',
-            'ghRepo',
-            'ghCommitMessage',
+            'netlifyHeaders',
+            'netlifyRedirects',
+            'netlifySiteID',
         );
 
         $keys = array_merge(
@@ -84,11 +76,10 @@ class Wp2static_Addon_Netlify {
     public function add_post_and_db_keys( $keys ) {
         $keys['netlify'] = array(
             'baseUrl-netlify',
-            'ghBranch',
-            'ghPath',
-            'ghToken',
-            'ghRepo',
-            'ghCommitMessage',
+            'netlifyHeaders',
+            'netlifyPersonalAccessToken',
+            'netlifyRedirects',
+            'netlifySiteID',
         );
 
         return $keys;

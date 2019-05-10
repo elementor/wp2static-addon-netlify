@@ -1,6 +1,8 @@
 <?php
 
-class Wp2static_Addon_Netlify_Loader {
+namespace WPStatic;
+
+class NetlifyLoader {
 
 	protected $actions;
 	protected $filters;
@@ -8,7 +10,6 @@ class Wp2static_Addon_Netlify_Loader {
 	public function __construct() {
 		$this->actions = array();
 		$this->filters = array();
-
 	}
 
 	public function add_action( $hook, $component, $callback, $priority = 10, $accepted_args = 1 ) {
