@@ -108,5 +108,3 @@ class Netlify extends SitePublisher {
         }
     }
 }
-
-$netlify = new Netlify();
