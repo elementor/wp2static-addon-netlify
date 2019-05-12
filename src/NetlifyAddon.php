@@ -71,8 +71,11 @@ class NetlifyAddon {
         return $keys;
     }
 
+    public function netlify_load_js( $hook ) {
+        if ( $hook !== 'toplevel_page_wp2static' ) {
+            return;
+        }
 
-	public function run() {
 		wp_enqueue_script(
             $this->plugin_name,
             plugin_dir_url( __FILE__ ) .
@@ -80,6 +83,10 @@ class NetlifyAddon {
             array( 'jquery' ),
             $this->version, false
         );
+    }
+
+	public function run() {
+        add_action( 'admin_enqueue_scripts', [ $this, 'netlify_load_js' ] );
 
         add_filter(
             'wp2static_add_deployment_method_option_to_ui',
