@@ -3,7 +3,7 @@
 /**
  * Plugin Name:       WP2Static Add-on: Netlify
  * Plugin URI:        https://wp2static.com
- * Description:       AWS Netlify as a deployment option for WP2Static.
+ * Description:       Netlify as a deployment option for WP2Static.
  * Version:           0.1
  * Author:            Leon Stafford
  * Author URI:        https://ljs.dev

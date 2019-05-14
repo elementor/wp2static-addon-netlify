@@ -1,7 +1,7 @@
 === Plugin Name ===
 Contributors: leonstafford
-Donate link: https://leonstafford.netlify.io
-Tags: wp2static,netlify,static
+Donate link: https://ljs.dev
+Tags: wp2static,netlfy,static
 Requires at least: 3.2
 Tested up to: 5.0.3
 Stable tag: 0.1
