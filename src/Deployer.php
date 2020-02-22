@@ -10,27 +10,33 @@ class Deployer {
 
     public function __construct() {}
 
-    public function upload_files ( $processed_site_path ) : void {
+    /**
+     * Post file hashes to Netlify and get list of required hashes
+     *
+     * @param mixed[] $hashes "filename" => "hash" list
+     * @return mixed[] array of hashes needing to be PUT
+     */
+    public function postHashes ( array $hashes ) : array {
         $site_id = Controller::getValue( 'siteID' );
         $access_token = \WP2StaticNetlify\Controller::encrypt_decrypt(
             'decrypt',
             Controller::getValue( 'accessToken' )
         );
 
-        error_log($site_id);
-        error_log($access_token);
-        /*
-         ie [
-                "/index.html": "aba4cedf9f9d47ac4905040f66b3a50767aeddc2",
-                "/style.css": "ee31f7fd72ad321582487cc20f4514ef1eb19d1c",
-            ]
-         */
+        error_log( print_r( $hashes, true ) );die();
+
+        // NOTE: formats to JSON as per
+        // https://docs.netlify.com/api/get-started/#file-digest-method
         $file_hashes = [
-            'files' => [
-                "/index.html" => "aba4cedf9f9d47ac4905040f66b3a50767aeddc2",
-                "/style.css" => "ee31f7fd72ad321582487cc20f4514ef1eb19d1c",
-            ]
+            'files' => $hashes
         ];
+
+        // ie $file_hashes = [
+        //     'files' => [
+        //         "/index.html" => "aba4cedf9f9d47ac4905040f66b3a50767aeddc2",
+        //         "/style.css" => "ee31f7fd72ad321582487cc20f4514ef1eb19d1c",
+        //     ]
+        // ];
 
         $client = new Client(
             ['base_uri' => 'https://api.netlify.com/']
@@ -40,7 +46,6 @@ class Deployer {
             'Authorization' => 'Bearer ' . $access_token,
             'Accept'        => 'application/json',
         ];
-
 
         $res = $client->request(
             'POST',
@@ -66,47 +71,17 @@ class Deployer {
         error_log( $response->state );
         error_log( print_r($response->required) );
 
-        // TODO: quick abort after testing
-        return;
+        return $response->required;
+
+    }
+
+    public function upload_files ( $processed_site_path ) : void {
+        $file_hashes = [];
 
         // check if dir exists
         if ( ! is_dir( $processed_site_path ) ) {
             return;
         }
-
-        $client_options = [
-            'profile' => Controller::getValue( 'netlifyProfile' ),
-            'version' => 'latest',
-            'region' => Controller::getValue( 'siteID' ),
-        ];
-
-        /*
-            If no credentials option, SDK attempts to load credentials from your environment in the following order:
-
-                 - environment variables.
-                 - a credentials .ini file.
-                 - an IAM role.
-        */
-        if (
-            Controller::getValue( 'netlifyAccessKeyID' ) &&
-            Controller::getValue( 'accessToken' )
-        ) {
-            error_log('using supplied creds');
-            $client_options['credentials'] = [
-                'key' => Controller::getValue( 'netlifyAccessKeyID' ),
-                'secret' => \WP2StaticNetlify\Controller::encrypt_decrypt(
-                    'decrypt',
-                    Controller::getValue( 'accessToken' )
-                )
-            ];
-            unset( $client_options['profile'] );
-        }
-
-        error_log(print_r($client_options, true));
-
-        // instantiate Netlify client
-        $netlify = new \Aws\Netlify\NetlifyClient( $client_options );
-
 
         // iterate each file in ProcessedSite
         $iterator = new RecursiveIteratorIterator(
@@ -122,14 +97,13 @@ class Deployer {
                 $real_filepath = realpath( $filename );
 
                 // TODO: do filepaths differ when running from WP-CLI (non-chroot)?
-
-                // TODO: check if in DeployCache
-                if ( \WP2Static\DeployCache::fileisCached( $filename ) ) {
-                    continue;
-                }
+                // TODO: check if in DeployCache (avoid hashing all files)
+                // if ( \WP2Static\DeployCache::fileisCached( $filename ) ) {
+                //     continue;
+                // }
 
                 if ( ! $real_filepath ) {
-                    $err = 'Trying to add unknown file to Zip: ' . $filename;
+                    $err = 'Trying to deploy unknown file: ' . $filename;
                     WsLog::l( $err );
                     continue;
                 }
@@ -141,24 +115,21 @@ class Deployer {
                     continue;
                 }
 
-                $key =
-                    Controller::getValue( 'netlifyRemotePath' ) ?
-                    Controller::getValue( 'netlifyRemotePath' ) . '/' . ltrim( str_replace( $processed_site_path, '', $filename ), '/' ) :
-                    ltrim( str_replace( $processed_site_path, '', $filename ),  '/' );
+                $remote_path = str_replace( $processed_site_path, '', $filename );
 
-                $result = $netlify->putObject([
-                    'Bucket' => Controller::getValue( 'netlifyBucket' ),
-                    'Key' => $key,
-                    'Body' => file_get_contents( $filename ),
-                    'ACL'    => 'public-read',
-                    'ContentType' => mime_content_type( $filename ),
-                ]);
+                $hash = sha1( $filename );
 
-                if ( $result['@metadata']['statusCode'] === 200 ) {
-                    \WP2Static\DeployCache::addFile( $filename );
-                }
+                $file_hashes[ $remote_path ] =  $hash;
+
+                // TODO: may skip DeployCache for Netlify when using file digest
+                // if ( $result['@metadata']['statusCode'] === 200 ) {
+                //     \WP2Static\DeployCache::addFile( $filename );
+                // }
             }
         }
+
+        $this->postHashes( $file_hashes );
+
     }
 
 
