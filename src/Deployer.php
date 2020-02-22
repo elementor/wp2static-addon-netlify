@@ -10,73 +10,9 @@ class Deployer {
 
     public function __construct() {}
 
-    /**
-     * Post file hashes to Netlify and get list of required hashes
-     *
-     * @param mixed[] $hashes "filename" => "hash" list
-     * @return mixed[] array of hashes needing to be PUT
-     */
-    public function postHashes ( array $hashes ) : array {
-        $site_id = Controller::getValue( 'siteID' );
-        $access_token = \WP2StaticNetlify\Controller::encrypt_decrypt(
-            'decrypt',
-            Controller::getValue( 'accessToken' )
-        );
-
-        error_log( print_r( $hashes, true ) );die();
-
-        // NOTE: formats to JSON as per
-        // https://docs.netlify.com/api/get-started/#file-digest-method
-        $file_hashes = [
-            'files' => $hashes
-        ];
-
-        // ie $file_hashes = [
-        //     'files' => [
-        //         "/index.html" => "aba4cedf9f9d47ac4905040f66b3a50767aeddc2",
-        //         "/style.css" => "ee31f7fd72ad321582487cc20f4514ef1eb19d1c",
-        //     ]
-        // ];
-
-        $client = new Client(
-            ['base_uri' => 'https://api.netlify.com/']
-        );
-
-        $headers = [
-            'Authorization' => 'Bearer ' . $access_token,
-            'Accept'        => 'application/json',
-        ];
-
-        $res = $client->request(
-            'POST',
-            "/api/v1/sites/$site_id/deploys",
-            [
-                'headers' => $headers,
-                'json' => $file_hashes,
-            ]
-        );
-
-        // error_log( $res->getStatusCode() );
-        // error_log( $res->getHeader('content-type')[0] );
-        // error_log( json_encode( json_decode( $res->getBody() ), JSON_PRETTY_PRINT ) );
-
-        /*
-            response contains:
-              - id: 5e51098987987ffa63ae
-              - state: uploading
-              - required: array of hashes required to PUT
-         */
-        $response = json_decode( $res->getBody() );
-        error_log( $response->id );
-        error_log( $response->state );
-        error_log( print_r($response->required) );
-
-        return $response->required;
-
-    }
-
     public function upload_files ( $processed_site_path ) : void {
         $file_hashes = [];
+        $filename_path_hashes = [];
 
         // check if dir exists
         if ( ! is_dir( $processed_site_path ) ) {
@@ -91,6 +27,7 @@ class Deployer {
             )
         );
 
+        // 1st iteration to get hashes
         foreach ( $iterator as $filename => $file_object ) {
             $base_name = basename( $filename );
             if ( $base_name != '.' && $base_name != '..' ) {
@@ -120,6 +57,7 @@ class Deployer {
                 $hash = sha1( $filename );
 
                 $file_hashes[ $remote_path ] =  $hash;
+                $filename_path_hashes[ $hash ] =  [ $filename, $remote_path ];
 
                 // TODO: may skip DeployCache for Netlify when using file digest
                 // if ( $result['@metadata']['statusCode'] === 200 ) {
@@ -128,7 +66,98 @@ class Deployer {
             }
         }
 
-        $this->postHashes( $file_hashes );
+        // send file hash to Netlify to check which are required
+        $site_id = Controller::getValue( 'siteID' );
+        $access_token = \WP2StaticNetlify\Controller::encrypt_decrypt(
+            'decrypt',
+            Controller::getValue( 'accessToken' )
+        );
+
+        // NOTE: formats to JSON as per
+        // https://docs.netlify.com/api/get-started/#file-digest-method
+        $payload = [ 'files' => $file_hashes ];
+
+        $client = new Client( ['base_uri' => 'https://api.netlify.com/'] );
+
+        $headers = [
+            'Authorization' => 'Bearer ' . $access_token,
+            'Accept'        => 'application/json',
+        ];
+
+        $res = $client->request(
+            'POST',
+            "/api/v1/sites/$site_id/deploys",
+            [
+                'headers' => $headers,
+                'json' => $payload,
+            ]
+        );
+
+        // error_log( $res->getStatusCode() );
+        // error_log( $res->getHeader('content-type')[0] );
+        // error_log( json_encode( json_decode( $res->getBody() ), JSON_PRETTY_PRINT ) );
+
+        /*
+            response contains:
+              - id: 5e51098987987ffa63ae
+              - state: uploading
+              - required: array of hashes required to PUT
+         */
+        $response = json_decode( $res->getBody() );
+
+        $deploy_id = $response->id;
+        $state =  $response->state;
+        $required_hashes = $response->required;
+
+        // error_log( print_r( $required_hashes, true ) );
+
+        // TODO: rm duplicate hashes - Netlify only wants one if identical
+
+        // TODO: easy optimizations by filtering lists
+        foreach ( $filename_path_hashes as $hash => $file_info ) {
+            $filename = $file_info[0];
+            $remote_path = $file_info[1];
+
+            // if hash is in required_hashes
+            if ( in_array( $hash, $required_hashes ) ) {
+                $headers = [
+                    'Authorization' => 'Bearer ' . $access_token,
+                    'Accept'        => 'application/json',
+                    'Content-Type' => 'application/octet-stream'
+                ];
+
+                error_log('sending required hash: ' . $hash );
+                error_log('filename: ' . $filename );
+                error_log('remote path: ' . $remote_path );
+                error_log('curent hash: ' . sha1( $filename ) );
+
+                // put file
+                $res = $client->request(
+                    'PUT',
+                    "/api/v1/deploys/$deploy_id/files/index.html",
+                    [
+                        'headers' => $headers,
+                        // 'body' => file_get_contents($filename),
+                        'body' => fopen($filename, 'r'),
+                    ]
+                );
+
+                error_log( json_encode( json_decode( $res->getBody() ), JSON_PRETTY_PRINT ) );
+
+
+            } else {
+                error_log('Not required (cached):');
+                error_log( print_r( $file_info, true ) );
+            }
+
+        }
+
+        error_log('finished PUTing to Netlify');
+
+
+        // TODO: optimization, build file_hashes once with filenames as extra column
+        // map array to just get paths + hashes for Netlify, then filter same original array to get all required hashes only, saving an extra walk 
+
 
     }
 
