@@ -25,7 +25,12 @@ class Deployer {
                 "/style.css": "ee31f7fd72ad321582487cc20f4514ef1eb19d1c",
             ]
          */
-        $file_hashes = [];
+        $file_hashes = [
+            'files' => [
+                "/index.html" => "aba4cedf9f9d47ac4905040f66b3a50767aeddc2",
+                "/style.css" => "ee31f7fd72ad321582487cc20f4514ef1eb19d1c",
+            ]
+        ];
 
         $client = new Client(
             ['base_uri' => 'https://api.netlify.com/']
@@ -40,12 +45,26 @@ class Deployer {
         $res = $client->request(
             'POST',
             "/api/v1/sites/$site_id/deploys",
-            [ 'headers' => $headers ]
+            [
+                'headers' => $headers,
+                'json' => $file_hashes,
+            ]
         );
 
-        error_log( $res->getStatusCode() );
-        error_log( $res->getHeader('content-type')[0] );
-        error_log( $res->getBody() );
+        // error_log( $res->getStatusCode() );
+        // error_log( $res->getHeader('content-type')[0] );
+        // error_log( json_encode( json_decode( $res->getBody() ), JSON_PRETTY_PRINT ) );
+
+        /*
+            response contains:
+              - id: 5e51098987987ffa63ae
+              - state: uploading
+              - required: array of hashes required to PUT
+         */
+        $response = json_decode( $res->getBody() );
+        error_log( $response->id );
+        error_log( $response->state );
+        error_log( print_r($response->required) );
 
         // TODO: quick abort after testing
         return;
