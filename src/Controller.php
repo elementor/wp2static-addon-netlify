@@ -31,7 +31,7 @@ class Controller {
         // if deployment_url option doesn't exist, create:
         $options = $this->getOptions();
 
-        if ( ! isset( $options['netlifyBucket'] ) ) {
+        if ( ! isset( $options['siteID'] ) ) {
             $this->seedOptions();
         }
 
@@ -97,103 +97,22 @@ class Controller {
         $table_name = $wpdb->prefix . 'wp2static_addon_netlify_options';
 
         $query_string = "INSERT INTO $table_name (name, value, label, description) VALUES (%s, %s, %s, %s);";
-        $query = $wpdb->prepare(
-            $query_string,
-            'cfDistributionID',
-            '',
-            'CloudFront Distribution ID',
-            'If using CloudFront, set this to auto-invalidate cache');
-
-        $wpdb->query( $query );
 
         $query = $wpdb->prepare(
             $query_string,
-            'netlifyBucket',
+            'accessToken',
             '',
-            'Bucket name',
+            'Personal Access Token',
             '');
 
         $wpdb->query( $query );
 
         $query = $wpdb->prepare(
             $query_string,
-            'netlifyAccessKeyID',
+            'siteID',
             '',
-            'Access Key ID',
+            'Site ID (Netlify or custom comain)',
             '');
-
-        $wpdb->query( $query );
-
-        $query = $wpdb->prepare(
-            $query_string,
-            'netlifySecretAccessKey',
-            '',
-            'Secret Access Key',
-            '');
-
-        $wpdb->query( $query );
-
-        $query = $wpdb->prepare(
-            $query_string,
-            'cfAccessKeyID',
-            '',
-            'Access Key ID',
-            '');
-
-        $wpdb->query( $query );
-
-        $query = $wpdb->prepare(
-            $query_string,
-            'cfSecretAccessKey',
-            '',
-            'Secret Access Key',
-            '');
-
-        $wpdb->query( $query );
-
-
-        $query = $wpdb->prepare(
-            $query_string,
-            'netlifyRegion',
-            '',
-            'Region',
-            '');
-
-        $wpdb->query( $query );
-
-        $query = $wpdb->prepare(
-            $query_string,
-            'netlifyProfile',
-            '',
-            'Profile',
-            '');
-
-        $wpdb->query( $query );
-
-        $query = $wpdb->prepare(
-            $query_string,
-            'cfRegion',
-            '',
-            'Region',
-            '');
-
-        $wpdb->query( $query );
-
-        $query = $wpdb->prepare(
-            $query_string,
-            'cfProfile',
-            '',
-            'Profile',
-            '');
-
-        $wpdb->query( $query );
-
-        $query = $wpdb->prepare(
-            $query_string,
-            'netlifyRemotePath',
-            '',
-            'Path prefix in bucket',
-            'Optionally, deploy to a subdirectory within bucket');
 
         $wpdb->query( $query );
     }
@@ -341,84 +260,23 @@ class Controller {
 
         $table_name = $wpdb->prefix . 'wp2static_addon_netlify_options';
 
-        $wpdb->update(
-            $table_name,
-            [ 'value' => sanitize_text_field( $_POST['cfDistributionID'] ) ],
-            [ 'name' => 'cfDistributionID' ]
-        );
-
-        $wpdb->update(
-            $table_name,
-            [ 'value' => sanitize_text_field( $_POST['netlifyBucket'] ) ],
-            [ 'name' => 'netlifyBucket' ]
-        );
-
-        $wpdb->update(
-            $table_name,
-            [ 'value' => sanitize_text_field( $_POST['netlifyAccessKeyID'] ) ],
-            [ 'name' => 'netlifyAccessKeyID' ]
-        );
-
-        $secret_access_key =
-            $_POST['netlifySecretAccessKey'] ?
+        $personal_access_token =
+            $_POST['accessToken'] ?
             self::encrypt_decrypt(
                 'encrypt',
-                 sanitize_text_field( $_POST['netlifySecretAccessKey'] )
+                 sanitize_text_field( $_POST['accessToken'] )
             ) : '';
 
         $wpdb->update(
             $table_name,
-            [ 'value' => $secret_access_key ],
-            [ 'name' => 'netlifySecretAccessKey' ]
+            [ 'value' => $personal_access_token ],
+            [ 'name' => 'accessToken' ]
         );
 
         $wpdb->update(
             $table_name,
-            [ 'value' => sanitize_text_field( $_POST['cfAccessKeyID'] ) ],
-            [ 'name' => 'cfAccessKeyID' ]
-        );
-
-        $secret_access_key =
-            $_POST['cfSecretAccessKey'] ?
-            self::encrypt_decrypt(
-                'encrypt',
-                 sanitize_text_field( $_POST['cfSecretAccessKey'] )
-            ) : '';
-
-        $wpdb->update(
-            $table_name,
-            [ 'value' => $secret_access_key ],
-            [ 'name' => 'cfSecretAccessKey' ]
-        );
-
-        $wpdb->update(
-            $table_name,
-            [ 'value' => sanitize_text_field( $_POST['netlifyRegion'] ) ],
-            [ 'name' => 'netlifyRegion' ]
-        );
-
-        $wpdb->update(
-            $table_name,
-            [ 'value' => sanitize_text_field( $_POST['cfRegion'] ) ],
-            [ 'name' => 'cfRegion' ]
-        );
-
-        $wpdb->update(
-            $table_name,
-            [ 'value' => sanitize_text_field( $_POST['netlifyProfile'] ) ],
-            [ 'name' => 'netlifyProfile' ]
-        );
-
-        $wpdb->update(
-            $table_name,
-            [ 'value' => sanitize_text_field( $_POST['cfProfile'] ) ],
-            [ 'name' => 'cfProfile' ]
-        );
-
-        $wpdb->update(
-            $table_name,
-            [ 'value' => sanitize_text_field( $_POST['netlifyRemotePath'] ) ],
-            [ 'name' => 'netlifyRemotePath' ]
+            [ 'value' => sanitize_text_field( $_POST['siteID'] ) ],
+            [ 'name' => 'siteID' ]
         );
 
         wp_safe_redirect( admin_url( 'admin.php?page=wp2static-netlify' ) );

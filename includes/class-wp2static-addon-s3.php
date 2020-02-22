@@ -52,7 +52,7 @@ class Wp2static_Addon_Netlify {
           'netlifyBucket',
           'netlifyCacheControl',
           'netlifyKey',
-          'netlifyRegion',
+          'siteID',
           'netlifyRemotePath',
           'netlifySecret',
         );
@@ -72,7 +72,7 @@ class Wp2static_Addon_Netlify {
           'netlifyBucket',
           'netlifyCacheControl',
           'netlifyKey',
-          'netlifyRegion',
+          'siteID',
           'netlifyRemotePath',
         );
 
@@ -91,7 +91,7 @@ class Wp2static_Addon_Netlify {
           'netlifyBucket',
           'netlifyCacheControl',
           'netlifyKey',
-          'netlifyRegion',
+          'siteID',
           'netlifyRemotePath',
           'netlifySecret',
         );

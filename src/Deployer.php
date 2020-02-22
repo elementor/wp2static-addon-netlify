@@ -4,22 +4,52 @@ namespace WP2StaticNetlify;
 
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
-use Aws\Netlify\NetlifyClient;
-use Aws\CloudFront\CloudFrontClient;
-use Aws\Exception\AwsException;
-
-// TODO: pull out of old core GuessMimeType( $local_file )
+use GuzzleHttp\Client;
 
 class Deployer {
-
-    // prepare deploy, if modifies URL structure, should be an action
-    // $this->prepareDeploy();
-
-    // options - load from addon's static methods
 
     public function __construct() {}
 
     public function upload_files ( $processed_site_path ) : void {
+        $site_id = Controller::getValue( 'siteID' );
+        $access_token = \WP2StaticNetlify\Controller::encrypt_decrypt(
+            'decrypt',
+            Controller::getValue( 'accessToken' )
+        );
+
+        error_log($site_id);
+        error_log($access_token);
+        /*
+         ie [
+                "/index.html": "aba4cedf9f9d47ac4905040f66b3a50767aeddc2",
+                "/style.css": "ee31f7fd72ad321582487cc20f4514ef1eb19d1c",
+            ]
+         */
+        $file_hashes = [];
+
+        $client = new Client(
+            ['base_uri' => 'https://api.netlify.com/']
+        );
+
+        $headers = [
+            'Authorization' => 'Bearer ' . $access_token,
+            'Accept'        => 'application/json',
+        ];
+
+
+        $res = $client->request(
+            'POST',
+            "/api/v1/sites/$site_id/deploys",
+            [ 'headers' => $headers ]
+        );
+
+        error_log( $res->getStatusCode() );
+        error_log( $res->getHeader('content-type')[0] );
+        error_log( $res->getBody() );
+
+        // TODO: quick abort after testing
+        return;
+
         // check if dir exists
         if ( ! is_dir( $processed_site_path ) ) {
             return;
@@ -28,7 +58,7 @@ class Deployer {
         $client_options = [
             'profile' => Controller::getValue( 'netlifyProfile' ),
             'version' => 'latest',
-            'region' => Controller::getValue( 'netlifyRegion' ),
+            'region' => Controller::getValue( 'siteID' ),
         ];
 
         /*
@@ -40,14 +70,14 @@ class Deployer {
         */
         if (
             Controller::getValue( 'netlifyAccessKeyID' ) &&
-            Controller::getValue( 'netlifySecretAccessKey' )
+            Controller::getValue( 'accessToken' )
         ) {
             error_log('using supplied creds');
             $client_options['credentials'] = [
                 'key' => Controller::getValue( 'netlifyAccessKeyID' ),
                 'secret' => \WP2StaticNetlify\Controller::encrypt_decrypt(
                     'decrypt',
-                    Controller::getValue( 'netlifySecretAccessKey' )
+                    Controller::getValue( 'accessToken' )
                 )
             ];
             unset( $client_options['profile'] );
@@ -135,14 +165,14 @@ class Deployer {
         */
         if (
             Controller::getValue( 'netlifyAccessKeyID' ) &&
-            Controller::getValue( 'netlifySecretAccessKey' )
+            Controller::getValue( 'accessToken' )
         ) {
 
             $credentials = new Aws\Credentials\Credentials(
                 Controller::getValue( 'netlifyAccessKeyID' ),
                 \WP2StaticNetlify\Controller::encrypt_decrypt(
                     'decrypt',
-                    Controller::getValue( 'netlifySecretAccessKey' )
+                    Controller::getValue( 'accessToken' )
                 )
             );
 
