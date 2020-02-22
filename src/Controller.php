@@ -3,7 +3,7 @@
 namespace WP2StaticNetlify;
 
 class Controller {
-    const WP2STATIC_Netlify_VERSION = '0.1';
+    const WP2STATIC_NETLIFY_VERSION = '0.1';
 
 	public function __construct() {}
 
