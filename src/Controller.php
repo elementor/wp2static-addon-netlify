@@ -1,9 +1,9 @@
 <?php
 
-namespace WP2StaticS3;
+namespace WP2StaticNetlify;
 
 class Controller {
-    const WP2STATIC_S3_VERSION = '0.1';
+    const WP2STATIC_Netlify_VERSION = '0.1';
 
 	public function __construct() {}
 
@@ -11,7 +11,7 @@ class Controller {
         // initialize options DB
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'wp2static_addon_s3_options';
+        $table_name = $wpdb->prefix . 'wp2static_addon_netlify_options';
 
         $charset_collate = $wpdb->get_charset_collate();
 
@@ -31,14 +31,14 @@ class Controller {
         // if deployment_url option doesn't exist, create:
         $options = $this->getOptions();
 
-        if ( ! isset( $options['s3Bucket'] ) ) {
+        if ( ! isset( $options['netlifyBucket'] ) ) {
             $this->seedOptions();
         }
 
-        add_filter( 'wp2static_add_menu_items', [ 'WP2StaticS3\Controller', 'addSubmenuPage' ] );
+        add_filter( 'wp2static_add_menu_items', [ 'WP2StaticNetlify\Controller', 'addSubmenuPage' ] );
 
         add_action(
-            'admin_post_wp2static_s3_save_options',
+            'admin_post_wp2static_netlify_save_options',
             [ $this, 'saveOptionsFromUI' ],
             15,
             1);
@@ -51,14 +51,14 @@ class Controller {
 
         add_action(
             'wp2static_post_deploy_trigger',
-            [ 'WP2StaticS3\Deployer', 'cloudfront_invalidate' ],
+            [ 'WP2StaticNetlify\Deployer', 'cloudfront_invalidate' ],
             15,
             1);
 
         // if ( defined( 'WP_CLI' ) ) {
         //     \WP_CLI::add_command(
-        //         'wp2static s3',
-        //         [ 'WP2StaticS3\CLI', 's3' ]);
+        //         'wp2static netlify',
+        //         [ 'WP2StaticNetlify\CLI', 'netlify' ]);
         // }
 	}
 
@@ -76,7 +76,7 @@ class Controller {
         global $wpdb;
         $options = [];
 
-        $table_name = $wpdb->prefix . 'wp2static_addon_s3_options';
+        $table_name = $wpdb->prefix . 'wp2static_addon_netlify_options';
 
         $rows = $wpdb->get_results( "SELECT * FROM $table_name" );
 
@@ -94,7 +94,7 @@ class Controller {
     public static function seedOptions() : void {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'wp2static_addon_s3_options';
+        $table_name = $wpdb->prefix . 'wp2static_addon_netlify_options';
 
         $query_string = "INSERT INTO $table_name (name, value, label, description) VALUES (%s, %s, %s, %s);";
         $query = $wpdb->prepare(
@@ -108,7 +108,7 @@ class Controller {
 
         $query = $wpdb->prepare(
             $query_string,
-            's3Bucket',
+            'netlifyBucket',
             '',
             'Bucket name',
             '');
@@ -117,7 +117,7 @@ class Controller {
 
         $query = $wpdb->prepare(
             $query_string,
-            's3AccessKeyID',
+            'netlifyAccessKeyID',
             '',
             'Access Key ID',
             '');
@@ -126,7 +126,7 @@ class Controller {
 
         $query = $wpdb->prepare(
             $query_string,
-            's3SecretAccessKey',
+            'netlifySecretAccessKey',
             '',
             'Secret Access Key',
             '');
@@ -154,7 +154,7 @@ class Controller {
 
         $query = $wpdb->prepare(
             $query_string,
-            's3Region',
+            'netlifyRegion',
             '',
             'Region',
             '');
@@ -163,7 +163,7 @@ class Controller {
 
         $query = $wpdb->prepare(
             $query_string,
-            's3Profile',
+            'netlifyProfile',
             '',
             'Profile',
             '');
@@ -190,7 +190,7 @@ class Controller {
 
         $query = $wpdb->prepare(
             $query_string,
-            's3RemotePath',
+            'netlifyRemotePath',
             '',
             'Path prefix in bucket',
             'Optionally, deploy to a subdirectory within bucket');
@@ -205,7 +205,7 @@ class Controller {
     public static function saveOption( $name, $value ) : void {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'wp2static_addon_s3_options';
+        $table_name = $wpdb->prefix . 'wp2static_addon_netlify_options';
 
         $query_string = "INSERT INTO $table_name (name, value) VALUES (%s, %s);";
         $query = $wpdb->prepare( $query_string, $name, $value );
@@ -213,28 +213,28 @@ class Controller {
         $wpdb->query( $query );
     }
 
-    public static function renderS3Page() : void {
+    public static function renderNetlifyPage() : void {
         $view = [];
-        $view['nonce_action'] = 'wp2static-s3-options';
+        $view['nonce_action'] = 'wp2static-netlify-options';
         $view['uploads_path'] = \WP2Static\SiteInfo::getPath('uploads');
-        $s3_path = \WP2Static\SiteInfo::getPath( 'uploads' ) . 'wp2static-processed-site.s3';
+        $netlify_path = \WP2Static\SiteInfo::getPath( 'uploads' ) . 'wp2static-processed-site.netlify';
 
 
         $view['options'] = self::getOptions();
 
-        $view['s3_url'] =
-            is_file( $s3_path ) ?
-                \WP2Static\SiteInfo::getUrl( 'uploads' ) . 'wp2static-processed-site.s3' : '#';
+        $view['netlify_url'] =
+            is_file( $netlify_path ) ?
+                \WP2Static\SiteInfo::getUrl( 'uploads' ) . 'wp2static-processed-site.netlify' : '#';
 
-        require_once __DIR__ . '/../views/s3-page.php';
+        require_once __DIR__ . '/../views/netlify-page.php';
     }
 
 
     public function deploy( $processed_site_path ) {
-        \WP2Static\WsLog::l('S3 Addon deploying');
+        \WP2Static\WsLog::l('Netlify Addon deploying');
 
-        $s3_deployer = new Deployer();
-        $s3_deployer->upload_files( $processed_site_path );
+        $netlify_deployer = new Deployer();
+        $netlify_deployer->upload_files( $processed_site_path );
     }
 
     /*
@@ -269,15 +269,15 @@ class Controller {
     }
 
     public static function activate_for_single_site() : void {
-        error_log('activating WP2Static S3 Add-on');
+        error_log('activating WP2Static Netlify Add-on');
     }
 
     public static function deactivate_for_single_site() : void {
-        error_log('deactivating WP2Static S3 Add-on, maintaining options');
+        error_log('deactivating WP2Static Netlify Add-on, maintaining options');
     }
 
     public static function deactivate( bool $network_wide = null ) : void {
-        error_log('deactivating WP2Static S3 Add-on');
+        error_log('deactivating WP2Static Netlify Add-on');
         if ( $network_wide ) {
             global $wpdb;
 
@@ -303,7 +303,7 @@ class Controller {
     }
 
     public static function activate( bool $network_wide = null ) : void {
-        error_log('activating s3 addon');
+        error_log('activating netlify addon');
         if ( $network_wide ) {
             global $wpdb;
 
@@ -329,17 +329,17 @@ class Controller {
     }
 
     public static function addSubmenuPage( $submenu_pages ) {
-        $submenu_pages['s3'] = [ 'WP2StaticS3\Controller', 'renderS3Page' ];
+        $submenu_pages['netlify'] = [ 'WP2StaticNetlify\Controller', 'renderNetlifyPage' ];
 
         return $submenu_pages;
     }
 
     public static function saveOptionsFromUI() {
-        check_admin_referer( 'wp2static-s3-options' );
+        check_admin_referer( 'wp2static-netlify-options' );
 
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'wp2static_addon_s3_options';
+        $table_name = $wpdb->prefix . 'wp2static_addon_netlify_options';
 
         $wpdb->update(
             $table_name,
@@ -349,27 +349,27 @@ class Controller {
 
         $wpdb->update(
             $table_name,
-            [ 'value' => sanitize_text_field( $_POST['s3Bucket'] ) ],
-            [ 'name' => 's3Bucket' ]
+            [ 'value' => sanitize_text_field( $_POST['netlifyBucket'] ) ],
+            [ 'name' => 'netlifyBucket' ]
         );
 
         $wpdb->update(
             $table_name,
-            [ 'value' => sanitize_text_field( $_POST['s3AccessKeyID'] ) ],
-            [ 'name' => 's3AccessKeyID' ]
+            [ 'value' => sanitize_text_field( $_POST['netlifyAccessKeyID'] ) ],
+            [ 'name' => 'netlifyAccessKeyID' ]
         );
 
         $secret_access_key =
-            $_POST['s3SecretAccessKey'] ?
+            $_POST['netlifySecretAccessKey'] ?
             self::encrypt_decrypt(
                 'encrypt',
-                 sanitize_text_field( $_POST['s3SecretAccessKey'] )
+                 sanitize_text_field( $_POST['netlifySecretAccessKey'] )
             ) : '';
 
         $wpdb->update(
             $table_name,
             [ 'value' => $secret_access_key ],
-            [ 'name' => 's3SecretAccessKey' ]
+            [ 'name' => 'netlifySecretAccessKey' ]
         );
 
         $wpdb->update(
@@ -393,8 +393,8 @@ class Controller {
 
         $wpdb->update(
             $table_name,
-            [ 'value' => sanitize_text_field( $_POST['s3Region'] ) ],
-            [ 'name' => 's3Region' ]
+            [ 'value' => sanitize_text_field( $_POST['netlifyRegion'] ) ],
+            [ 'name' => 'netlifyRegion' ]
         );
 
         $wpdb->update(
@@ -405,8 +405,8 @@ class Controller {
 
         $wpdb->update(
             $table_name,
-            [ 'value' => sanitize_text_field( $_POST['s3Profile'] ) ],
-            [ 'name' => 's3Profile' ]
+            [ 'value' => sanitize_text_field( $_POST['netlifyProfile'] ) ],
+            [ 'name' => 'netlifyProfile' ]
         );
 
         $wpdb->update(
@@ -417,11 +417,11 @@ class Controller {
 
         $wpdb->update(
             $table_name,
-            [ 'value' => sanitize_text_field( $_POST['s3RemotePath'] ) ],
-            [ 'name' => 's3RemotePath' ]
+            [ 'value' => sanitize_text_field( $_POST['netlifyRemotePath'] ) ],
+            [ 'name' => 'netlifyRemotePath' ]
         );
 
-        wp_safe_redirect( admin_url( 'admin.php?page=wp2static-s3' ) );
+        wp_safe_redirect( admin_url( 'admin.php?page=wp2static-netlify' ) );
         exit;
     }
 
@@ -433,7 +433,7 @@ class Controller {
     public static function getValue( string $name ) : string {
         global $wpdb;
 
-        $table_name = $wpdb->prefix . 'wp2static_addon_s3_options';
+        $table_name = $wpdb->prefix . 'wp2static_addon_netlify_options';
 
         $sql = $wpdb->prepare(
             "SELECT value FROM $table_name WHERE" . ' name = %s LIMIT 1',

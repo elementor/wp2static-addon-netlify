@@ -1,6 +1,6 @@
 {
-    "name": "wp2static/wp2static-addon-s3",
-    "description": "S3 deployment Add-on for WP2Static.",
+    "name": "wp2static/wp2static-addon-netlify",
+    "description": "Netlify deployment Add-on for WP2Static.",
     "homepage": "https://wp2static.com",
       "license": "UNLICENSE",
       "authors": [
@@ -12,10 +12,10 @@
       ],
     "type": "wordpress-plugin",
     "support": {
-        "issues": "https://github.com/WP2Static/wp2static-addon-s3/issues",
+        "issues": "https://github.com/WP2Static/wp2static-addon-netlify/issues",
         "forum": "https://wp2static.com/community",
         "docs": "https://wp2static.com/documentation",
-        "source": "https://github.com/WP2Static/wp2static-addon-s3"
+        "source": "https://github.com/WP2Static/wp2static-addon-netlify"
     },
     "repositories": [
         {
@@ -37,13 +37,13 @@
     },
     "autoload": {
         "psr-4": {
-            "WP2StaticS3\\": "src/"
+            "WP2StaticNetlify\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "PHPStan\\WordPress\\": "tests/phpstan/",
-            "WP2StaticS3\\": "src/"
+            "WP2StaticNetlify\\": "src/"
         }
     },
     "config": {

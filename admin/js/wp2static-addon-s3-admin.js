@@ -2,22 +2,22 @@
 	'use strict';
 
 	$(function() {
-    deploy_options['s3'] = {
+    deploy_options['netlify'] = {
       exportSteps: [
-          's3_prepare_export',
-          's3_transfer_files',
+          'netlify_prepare_export',
+          'netlify_transfer_files',
           'cloudfront_invalidate_all_items',
           'finalize_deployment'
       ],
       required_fields: {
-        s3Key: 'Please input an S3 Key in order to authenticate when using the S3 deployment method.',
-        s3Secret: 'Please input an S3 Secret in order to authenticate when using the S3 deployment method.',
-        s3Bucket: 'Please input the name of the S3 bucket you are trying to deploy to.',
+        netlifyKey: 'Please input an Netlify Key in order to authenticate when using the Netlify deployment method.',
+        netlifySecret: 'Please input an Netlify Secret in order to authenticate when using the Netlify deployment method.',
+        netlifyBucket: 'Please input the name of the Netlify bucket you are trying to deploy to.',
       }
     };
 
-    status_descriptions['s3_prepare_export'] = 'Preparing files for S3 deployment';
-    status_descriptions['s3_transfer_files'] = 'Deploying files to S3';
+    status_descriptions['netlify_prepare_export'] = 'Preparing files for Netlify deployment';
+    status_descriptions['netlify_transfer_files'] = 'Deploying files to Netlify';
     status_descriptions['cloudfront_invalidate_all_items'] = 'Invalidating CloudFront cache';
   }); // end DOM ready
 

@@ -1,6 +1,6 @@
 <?php
 
-class Wp2static_Addon_S3 {
+class Wp2static_Addon_Netlify {
 
 	protected $loader;
 	protected $plugin_name;
@@ -12,21 +12,21 @@ class Wp2static_Addon_S3 {
 		} else {
 			$this->version = '1.0.0';
 		}
-		$this->plugin_name = 'wp2static-addon-s3';
+		$this->plugin_name = 'wp2static-addon-netlify';
 
 		$this->load_dependencies();
 		$this->define_admin_hooks();
 	}
 
 	private function load_dependencies() {
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp2static-addon-s3-loader.php';
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-wp2static-addon-s3-admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp2static-addon-netlify-loader.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-wp2static-addon-netlify-admin.php';
 
-		$this->loader = new Wp2static_Addon_S3_Loader();
+		$this->loader = new Wp2static_Addon_Netlify_Loader();
 	}
 
 	private function define_admin_hooks() {
-		$plugin_admin = new Wp2static_Addon_S3_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Wp2static_Addon_Netlify_Admin( $this->get_plugin_name(), $this->get_version() );
 
         if ( isset( $_GET['page'] ) && ( $_GET['page'] == 'wp2static')) {
             $this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -34,27 +34,27 @@ class Wp2static_Addon_S3 {
 	}
 
     public function add_deployment_option_to_ui( $deploy_options ) {
-        $deploy_options['s3'] = array('Amazon S3');
+        $deploy_options['netlify'] = array('Amazon Netlify');
 
         return $deploy_options;
     }
 
     public function load_deployment_option_template( $templates ) {
-        $templates[] =  __DIR__ . '/../views/s3_settings_block.phtml';
+        $templates[] =  __DIR__ . '/../views/netlify_settings_block.phtml';
 
         return $templates;
     }
 
     public function add_deployment_option_keys( $keys ) {
         $new_keys = array(
-          'baseUrl-s3',
+          'baseUrl-netlify',
           'cfDistributionId',
-          's3Bucket',
-          's3CacheControl',
-          's3Key',
-          's3Region',
-          's3RemotePath',
-          's3Secret',
+          'netlifyBucket',
+          'netlifyCacheControl',
+          'netlifyKey',
+          'netlifyRegion',
+          'netlifyRemotePath',
+          'netlifySecret',
         );
 
         $keys = array_merge(
@@ -67,13 +67,13 @@ class Wp2static_Addon_S3 {
 
     public function whitelist_deployment_option_keys( $keys ) {
         $whitelist_keys = array(
-          'baseUrl-s3',
+          'baseUrl-netlify',
           'cfDistributionId',
-          's3Bucket',
-          's3CacheControl',
-          's3Key',
-          's3Region',
-          's3RemotePath',
+          'netlifyBucket',
+          'netlifyCacheControl',
+          'netlifyKey',
+          'netlifyRegion',
+          'netlifyRemotePath',
         );
 
         $keys = array_merge(
@@ -85,15 +85,15 @@ class Wp2static_Addon_S3 {
     }
 
     public function add_post_and_db_keys( $keys ) {
-        $keys['s3'] = array(
-          'baseUrl-s3',
+        $keys['netlify'] = array(
+          'baseUrl-netlify',
           'cfDistributionId',
-          's3Bucket',
-          's3CacheControl',
-          's3Key',
-          's3Region',
-          's3RemotePath',
-          's3Secret',
+          'netlifyBucket',
+          'netlifyCacheControl',
+          'netlifyKey',
+          'netlifyRegion',
+          'netlifyRemotePath',
+          'netlifySecret',
         );
 
         return $keys;

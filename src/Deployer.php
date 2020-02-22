@@ -1,10 +1,10 @@
 <?php
 
-namespace WP2StaticS3;
+namespace WP2StaticNetlify;
 
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
-use Aws\S3\S3Client;
+use Aws\Netlify\NetlifyClient;
 use Aws\CloudFront\CloudFrontClient;
 use Aws\Exception\AwsException;
 
@@ -26,9 +26,9 @@ class Deployer {
         }
 
         $client_options = [
-            'profile' => Controller::getValue( 's3Profile' ),
+            'profile' => Controller::getValue( 'netlifyProfile' ),
             'version' => 'latest',
-            'region' => Controller::getValue( 's3Region' ),
+            'region' => Controller::getValue( 'netlifyRegion' ),
         ];
 
         /*
@@ -39,15 +39,15 @@ class Deployer {
                  - an IAM role.
         */
         if (
-            Controller::getValue( 's3AccessKeyID' ) &&
-            Controller::getValue( 's3SecretAccessKey' )
+            Controller::getValue( 'netlifyAccessKeyID' ) &&
+            Controller::getValue( 'netlifySecretAccessKey' )
         ) {
             error_log('using supplied creds');
             $client_options['credentials'] = [
-                'key' => Controller::getValue( 's3AccessKeyID' ),
-                'secret' => \WP2StaticS3\Controller::encrypt_decrypt(
+                'key' => Controller::getValue( 'netlifyAccessKeyID' ),
+                'secret' => \WP2StaticNetlify\Controller::encrypt_decrypt(
                     'decrypt',
-                    Controller::getValue( 's3SecretAccessKey' )
+                    Controller::getValue( 'netlifySecretAccessKey' )
                 )
             ];
             unset( $client_options['profile'] );
@@ -55,8 +55,8 @@ class Deployer {
 
         error_log(print_r($client_options, true));
 
-        // instantiate S3 client
-        $s3 = new \Aws\S3\S3Client( $client_options );
+        // instantiate Netlify client
+        $netlify = new \Aws\Netlify\NetlifyClient( $client_options );
 
 
         // iterate each file in ProcessedSite
@@ -93,12 +93,12 @@ class Deployer {
                 }
 
                 $key =
-                    Controller::getValue( 's3RemotePath' ) ?
-                    Controller::getValue( 's3RemotePath' ) . '/' . ltrim( str_replace( $processed_site_path, '', $filename ), '/' ) :
+                    Controller::getValue( 'netlifyRemotePath' ) ?
+                    Controller::getValue( 'netlifyRemotePath' ) . '/' . ltrim( str_replace( $processed_site_path, '', $filename ), '/' ) :
                     ltrim( str_replace( $processed_site_path, '', $filename ),  '/' );
 
-                $result = $s3->putObject([
-                    'Bucket' => Controller::getValue( 's3Bucket' ),
+                $result = $netlify->putObject([
+                    'Bucket' => Controller::getValue( 'netlifyBucket' ),
                     'Key' => $key,
                     'Body' => file_get_contents( $filename ),
                     'ACL'    => 'public-read',
@@ -134,15 +134,15 @@ class Deployer {
                  - an IAM role.
         */
         if (
-            Controller::getValue( 's3AccessKeyID' ) &&
-            Controller::getValue( 's3SecretAccessKey' )
+            Controller::getValue( 'netlifyAccessKeyID' ) &&
+            Controller::getValue( 'netlifySecretAccessKey' )
         ) {
 
             $credentials = new Aws\Credentials\Credentials(
-                Controller::getValue( 's3AccessKeyID' ),
-                \WP2StaticS3\Controller::encrypt_decrypt(
+                Controller::getValue( 'netlifyAccessKeyID' ),
+                \WP2StaticNetlify\Controller::encrypt_decrypt(
                     'decrypt',
-                    Controller::getValue( 's3SecretAccessKey' )
+                    Controller::getValue( 'netlifySecretAccessKey' )
                 )
             );
 
@@ -155,7 +155,7 @@ class Deployer {
             $result = $client->createInvalidation([
                 'DistributionId' => Controller::getValue( 'cfDistributionID' ),
                 'InvalidationBatch' => [
-                    'CallerReference' => 'WP2Static S3 Add-on',
+                    'CallerReference' => 'WP2Static Netlify Add-on',
                     'Paths' => [
                         'Items' => ['/*'],
                         'Quantity' => 1,
