@@ -72,8 +72,7 @@
         "test": [
             "@lint",
             "@phpcs",
-            "@phpstan",
-            "@phpunit"
+            "@phpstan"
         ],
         "build": "/bin/sh tools/build_release.sh",
         "post-install-cmd": "sh ./tools/composer-post-install.sh"

@@ -5,9 +5,7 @@ namespace WP2StaticNetlify;
 class Controller {
     const WP2STATIC_NETLIFY_VERSION = '0.1';
 
-    public function __construct() {}
-
-    public function run() : void  {
+    public function run() : void {
         // initialize options DB
         global $wpdb;
 
