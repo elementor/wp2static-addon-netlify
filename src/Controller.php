@@ -148,9 +148,8 @@ class Controller {
         require_once __DIR__ . '/../views/netlify-page.php';
     }
 
-
     public function deploy( $processed_site_path ) {
-        \WP2Static\WsLog::l('Netlify Addon deploying');
+        \WP2Static\WsLog::l('Starting Netlify deployment.');
 
         $netlify_deployer = new Deployer();
         $netlify_deployer->upload_files( $processed_site_path );
