@@ -13,7 +13,7 @@ use GuzzleHttp\Client;
  */
 class Deployer {
 
-    public function upload_files( $processed_site_path ) : void {
+    public function upload_files( string $processed_site_path ) : void {
         $deployed = 0;
         $cache_skipped = 0;
         $file_hashes = [];
@@ -39,7 +39,7 @@ class Deployer {
 
                 if ( ! $real_filepath ) {
                     $err = 'Trying to deploy unknown file: ' . $filename;
-                    WsLog::l( $err );
+                    \WP2Static\WsLog::l( $err );
                     continue;
                 }
 

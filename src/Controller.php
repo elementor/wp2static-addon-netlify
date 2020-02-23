@@ -7,7 +7,7 @@ class Controller {
 
     public function __construct() {}
 
-    public function run() {
+    public function run() : void  {
         // initialize options DB
         global $wpdb;
 
@@ -54,23 +54,11 @@ class Controller {
             1
         );
 
-        add_action(
-            'wp2static_post_deploy_trigger',
-            [ 'WP2StaticNetlify\Deployer', 'cloudfront_invalidate' ],
-            15,
-            1
-        );
-
         // if ( defined( 'WP_CLI' ) ) {
         // \WP_CLI::add_command(
         // 'wp2static netlify',
         // [ 'WP2StaticNetlify\CLI', 'netlify' ]);
         // }
-    }
-
-    // TODO: is this needed? confirm slashing of destination URLs...
-    public function modifyWordPressSiteURL( $site_url ) {
-        return rtrim( $site_url, '/' );
     }
 
     /**
@@ -128,8 +116,10 @@ class Controller {
 
     /**
      * Save options
+     *
+     * @param mixed $value value to save
      */
-    public static function saveOption( $name, $value ) : void {
+    public static function saveOption( string $name, $value ) : void {
         global $wpdb;
 
         $table_name = $wpdb->prefix . 'wp2static_addon_netlify_options';
@@ -156,7 +146,7 @@ class Controller {
         require_once __DIR__ . '/../views/netlify-page.php';
     }
 
-    public function deploy( $processed_site_path ) {
+    public function deploy( string $processed_site_path ) : void {
         \WP2Static\WsLog::l( 'Starting Netlify deployment.' );
 
         $netlify_deployer = new Deployer();
@@ -166,9 +156,9 @@ class Controller {
     /*
      * Naive encypting/decrypting
      *
+     * @throws WP2StaticException
      */
-    public static function encrypt_decrypt( $action, $string ) {
-        $output = false;
+    public static function encrypt_decrypt( string $action, string $string ) : string {
         $encrypt_method = 'AES-256-CBC';
 
         $secret_key =
@@ -184,12 +174,9 @@ class Controller {
         $key = hash( 'sha256', $secret_key );
         $variate = substr( hash( 'sha256', $secret_iv ), 0, 16 );
 
-        if ( $action == 'encrypt' ) {
-            $output = openssl_encrypt( $string, $encrypt_method, $key, 0, $variate );
-            $output = base64_encode( $output );
-        } elseif ( $action == 'decrypt' ) {
-            $output = openssl_decrypt(
-                base64_decode( $string ),
+        if ( $action == 'decrypt' ) {
+            return (string) openssl_decrypt(
+                (string) base64_decode( $string ),
                 $encrypt_method,
                 $key,
                 0,
@@ -197,7 +184,9 @@ class Controller {
             );
         }
 
-        return $output;
+        $output = openssl_encrypt( $string, $encrypt_method, $key, 0, $variate );
+
+        return (string) base64_encode( (string) $output );
     }
 
     public static function activate_for_single_site() : void {
@@ -260,13 +249,19 @@ class Controller {
         }
     }
 
-    public static function addSubmenuPage( $submenu_pages ) {
+    /**
+     * Add submenu to WP2Static sidebar menu
+     *
+     * @param mixed[] $submenu_pages list of menu items
+     * @return mixed[] list of menu items
+     */
+    public static function addSubmenuPage( array $submenu_pages ) : array {
         $submenu_pages['netlify'] = [ 'WP2StaticNetlify\Controller', 'renderNetlifyPage' ];
 
         return $submenu_pages;
     }
 
-    public static function saveOptionsFromUI() {
+    public static function saveOptionsFromUI() : void {
         check_admin_referer( 'wp2static-netlify-options' );
 
         global $wpdb;
