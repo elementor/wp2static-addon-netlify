@@ -13,7 +13,7 @@ use GuzzleHttp\Client;
  */
 class Deployer {
 
-    public function upload_files ( $processed_site_path ) : void {
+    public function upload_files( $processed_site_path ) : void {
         $deployed = 0;
         $cache_skipped = 0;
         $file_hashes = [];
@@ -52,8 +52,8 @@ class Deployer {
 
                 $remote_path = str_replace( $processed_site_path, '', $filename );
                 $hash = sha1_file( $filename );
-                $file_hashes[ $remote_path ] =  $hash;
-                $filename_path_hashes[ $hash ] =  [ $filename, $remote_path ];
+                $file_hashes[ $remote_path ] = $hash;
+                $filename_path_hashes[ $hash ] = [ $filename, $remote_path ];
             }
         }
 
@@ -66,7 +66,7 @@ class Deployer {
 
         $payload = [ 'files' => $file_hashes ];
 
-        $client = new Client( ['base_uri' => 'https://api.netlify.com/'] );
+        $client = new Client( [ 'base_uri' => 'https://api.netlify.com/' ] );
 
         $headers = [
             'Authorization' => 'Bearer ' . $access_token,
@@ -84,7 +84,7 @@ class Deployer {
 
         $response = json_decode( $res->getBody() );
         $deploy_id = $response->id;
-        $state =  $response->state;
+        $state = $response->state;
         $required_hashes = $response->required;
 
         // TODO: rm duplicate hashes - Netlify only wants one if identical
@@ -98,7 +98,7 @@ class Deployer {
                 $headers = [
                     'Authorization' => 'Bearer ' . $access_token,
                     'Accept'        => 'application/json',
-                    'Content-Type' => 'application/octet-stream'
+                    'Content-Type' => 'application/octet-stream',
                 ];
 
                 $remote_path = urlencode( $remote_path );
@@ -109,7 +109,7 @@ class Deployer {
                     [
                         'headers' => $headers,
                         // 'body' => file_get_contents($filename),
-                        'body' => fopen($filename, 'r'),
+                        'body' => fopen( $filename, 'r' ),
                     ]
                 );
 
