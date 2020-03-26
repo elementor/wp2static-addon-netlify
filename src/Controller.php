@@ -103,7 +103,7 @@ class Controller {
             $query_string,
             'siteID',
             '',
-            'Site ID (Netlify or custom comain)',
+            'Site ID',
             ''
         );
 
