@@ -41,7 +41,7 @@
                     name="<?php echo $view['options']['accessToken']->name; ?>"
                     type="password"
                     value="<?php echo $view['options']['accessToken']->value !== '' ?
-                        \WP2StaticNetlify\Controller::encrypt_decrypt('decrypt', $view['options']['accessToken']->value) :
+                        \WP2Static\Controller::encrypt_decrypt('decrypt', $view['options']['accessToken']->value) :
                         ''; ?>"
                 />
             </td>

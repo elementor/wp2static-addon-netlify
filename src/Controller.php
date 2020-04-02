@@ -149,42 +149,6 @@ class Controller {
         $netlify_deployer->upload_files( $processed_site_path );
     }
 
-    /*
-     * Naive encypting/decrypting
-     *
-     * @throws WP2StaticException
-     */
-    public static function encrypt_decrypt( string $action, string $string ) : string {
-        $encrypt_method = 'AES-256-CBC';
-
-        $secret_key =
-            defined( 'AUTH_KEY' ) ?
-            constant( 'AUTH_KEY' ) :
-            'LC>_cVZv34+W.P&_8d|ejfr]d31h)J?z5n(LB6iY=;P@?5/qzJSyB3qctr,.D$[L';
-
-        $secret_iv =
-            defined( 'AUTH_SALT' ) ?
-            constant( 'AUTH_SALT' ) :
-            'ec64SSHB{8|AA_ThIIlm:PD(Z!qga!/Dwll 4|i.?UkC§NNO}z?{Qr/q.KpH55K9';
-
-        $key = hash( 'sha256', $secret_key );
-        $variate = substr( hash( 'sha256', $secret_iv ), 0, 16 );
-
-        if ( $action == 'decrypt' ) {
-            return (string) openssl_decrypt(
-                (string) base64_decode( $string ),
-                $encrypt_method,
-                $key,
-                0,
-                $variate
-            );
-        }
-
-        $output = openssl_encrypt( $string, $encrypt_method, $key, 0, $variate );
-
-        return (string) base64_encode( (string) $output );
-    }
-
     public static function activate_for_single_site() : void {
         error_log( 'activating WP2Static Netlify Add-on' );
     }
@@ -266,7 +230,7 @@ class Controller {
 
         $personal_access_token =
             $_POST['accessToken'] ?
-            self::encrypt_decrypt(
+            \WP2Static\Controller::encrypt_decrypt(
                 'encrypt',
                 sanitize_text_field( $_POST['accessToken'] )
             ) : '';
