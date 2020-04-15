@@ -4,25 +4,6 @@ namespace WP2StaticNetlify;
 
 class Controller {
     public function run() : void {
-        // initialize options DB
-        global $wpdb;
-
-        $table_name = $wpdb->prefix . 'wp2static_addon_netlify_options';
-
-        $charset_collate = $wpdb->get_charset_collate();
-
-        $sql = "CREATE TABLE $table_name (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            name VARCHAR(255) NOT NULL,
-            value VARCHAR(255) NOT NULL,
-            label VARCHAR(255) NULL,
-            description VARCHAR(255) NULL,
-            PRIMARY KEY  (id)
-        ) $charset_collate;";
-
-        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-        dbDelta( $sql );
-
         // check for seed data
         // if deployment_url option doesn't exist, create:
         $options = $this->getOptions();
@@ -150,15 +131,31 @@ class Controller {
     }
 
     public static function activate_for_single_site() : void {
-        error_log( 'activating WP2Static Netlify Add-on' );
+        // initialize options DB
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'wp2static_addon_netlify_options';
+
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            name VARCHAR(255) NOT NULL,
+            value VARCHAR(255) NOT NULL,
+            label VARCHAR(255) NULL,
+            description VARCHAR(255) NULL,
+            PRIMARY KEY  (id)
+        ) $charset_collate;";
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta( $sql );
+
     }
 
     public static function deactivate_for_single_site() : void {
-        error_log( 'deactivating WP2Static Netlify Add-on, maintaining options' );
     }
 
     public static function deactivate( bool $network_wide = null ) : void {
-        error_log( 'deactivating WP2Static Netlify Add-on' );
         if ( $network_wide ) {
             global $wpdb;
 
@@ -184,7 +181,6 @@ class Controller {
     }
 
     public static function activate( bool $network_wide = null ) : void {
-        error_log( 'activating netlify addon' );
         if ( $network_wide ) {
             global $wpdb;
 

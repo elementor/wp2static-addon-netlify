@@ -17,16 +17,6 @@
         "docs": "https://wp2static.com/documentation",
         "source": "https://github.com/WP2Static/wp2static-addon-netlify"
     },
-    "repositories": [
-        {
-            "type": "pear",
-            "url": "https://pear.php.net"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/leonstafford/wordpress-stubs.git"
-        }
-    ],
     "require": {
         "php": ">=7.2",
         "guzzlehttp/guzzle": "^6.5"
