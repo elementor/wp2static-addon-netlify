@@ -4,14 +4,6 @@ namespace WP2StaticNetlify;
 
 class Controller {
     public function run() : void {
-        // check for seed data
-        // if deployment_url option doesn't exist, create:
-        $options = $this->getOptions();
-
-        if ( ! isset( $options['siteID'] ) ) {
-            $this->seedOptions();
-        }
-
         add_filter(
             'wp2static_add_menu_items',
             [ 'WP2StaticNetlify\Controller', 'addSubmenuPage' ]
@@ -30,12 +22,6 @@ class Controller {
             15,
             1
         );
-
-        // if ( defined( 'WP_CLI' ) ) {
-        // \WP_CLI::add_command(
-        // 'wp2static netlify',
-        // [ 'WP2StaticNetlify\CLI', 'netlify' ]);
-        // }
     }
 
     /**
@@ -150,6 +136,13 @@ class Controller {
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta( $sql );
 
+        // check for seed data
+        // if deployment_url option doesn't exist, create:
+        $options = self::getOptions();
+
+        if ( ! isset( $options['siteID'] ) ) {
+            self::seedOptions();
+        }
     }
 
     public static function deactivate_for_single_site() : void {
