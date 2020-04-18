@@ -219,7 +219,7 @@ class Controller {
 
         $personal_access_token =
             $_POST['accessToken'] ?
-            \WP2Static\Controller::encrypt_decrypt(
+            \WP2Static\CoreOptions::encrypt_decrypt(
                 'encrypt',
                 sanitize_text_field( $_POST['accessToken'] )
             ) : '';

@@ -59,7 +59,7 @@ class Deployer {
 
         // Send digest to Netlify to confirm which files have changed
         $site_id = Controller::getValue( 'siteID' );
-        $access_token = \WP2Static\Controller::encrypt_decrypt(
+        $access_token = \WP2Static\CoreOptions::encrypt_decrypt(
             'decrypt',
             Controller::getValue( 'accessToken' )
         );
