@@ -29,6 +29,15 @@ class Controller {
             15,
             1
         );
+
+        do_action(
+            'wp2static_register_addon',
+            'wp2static-addon-netlify',
+            'deploy',
+            'Netlify Deployment',
+            'https://wp2static.com/addons/netlify/',
+            'Auto-deploy your generated static site to Netlify.'
+        );
     }
 
     /**
