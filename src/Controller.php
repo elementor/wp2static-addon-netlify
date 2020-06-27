@@ -22,6 +22,13 @@ class Controller {
             15,
             1
         );
+
+        add_action(
+            'admin_menu',
+            [ $this, 'addOptionsPage' ],
+            15,
+            1
+        );
     }
 
     /**
@@ -236,7 +243,7 @@ class Controller {
             [ 'name' => 'siteID' ]
         );
 
-        wp_safe_redirect( admin_url( 'admin.php?page=wp2static-netlify' ) );
+        wp_safe_redirect( admin_url( 'admin.php?page=wp2static-addon-netlify' ) );
         exit;
     }
 
@@ -263,5 +270,15 @@ class Controller {
 
         return $option_value;
     }
-}
 
+    public function addOptionsPage() : void {
+        add_submenu_page(
+            null,
+            'Netlify Deployment Options',
+            'Netlify Deployment Options',
+            'manage_options',
+            'wp2static-addon-netlify',
+            [ $this, 'renderNetlifyPage' ]
+        );
+    }
+}
