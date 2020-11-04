@@ -4,7 +4,7 @@
  * Plugin Name:       WP2Static Add-on: Netlify Deployment
  * Plugin URI:        https://wp2static.com
  * Description:       Netlify deployment add-on for WP2Static.
- * Version:           1.0-alpha-006
+ * Version:           1.0-alpha-007
  * Author:            Leon Stafford
  * Author URI:        https://ljs.dev
  * License:           Unlicense
@@ -17,9 +17,11 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 define( 'WP2STATIC_NETLIFY_PATH', plugin_dir_path( __FILE__ ) );
-define( 'WP2STATIC_NETLIFY_VERSION', '1.0-alpha-006' );
+define( 'WP2STATIC_NETLIFY_VERSION', '1.0-alpha-007' );
 
-require WP2STATIC_NETLIFY_PATH . 'vendor/autoload.php';
+if ( file_exists( WP2STATIC_NETLIFY_PATH . 'vendor/autoload.php' ) ) {
+    require WP2STATIC_NETLIFY_PATH . 'vendor/autoload.php';
+}
 
 function run_wp2static_addon_netlify() {
     $controller = new WP2StaticNetlify\Controller();

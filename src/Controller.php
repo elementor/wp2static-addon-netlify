@@ -22,6 +22,29 @@ class Controller {
             15,
             1
         );
+
+        add_action(
+            'admin_menu',
+            [ $this, 'addOptionsPage' ],
+            15,
+            1
+        );
+
+        do_action(
+            'wp2static_register_addon',
+            'wp2static-addon-netlify',
+            'deploy',
+            'Netlify Deployment',
+            'https://wp2static.com/addons/netlify/',
+            'Deploys to Netlify'
+        );
+
+        if ( defined( 'WP_CLI' ) ) {
+            \WP_CLI::add_command(
+                'wp2static netlify',
+                [ CLI::class, 'netlify' ]
+            );
+        }
     }
 
     /**
@@ -262,6 +285,17 @@ class Controller {
         }
 
         return $option_value;
+    }
+
+    public function addOptionsPage() : void {
+        add_submenu_page(
+            '',
+            'Netlify Deployment Options',
+            'Netlify Deployment Options',
+            'manage_options',
+            'wp2static-addon-netlify',
+            [ $this, 'renderNetlifyPage' ]
+        );
     }
 }
 
