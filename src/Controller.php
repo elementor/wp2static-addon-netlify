@@ -259,7 +259,10 @@ class Controller {
             [ 'name' => 'siteID' ]
         );
 
-        wp_safe_redirect( admin_url( 'admin.php?page=wp2static-netlify' ) );
+        wp_safe_redirect(
+            admin_url( 'admin.php?page=wp2static-addon-netlify' )
+        );
+
         exit;
     }
 
