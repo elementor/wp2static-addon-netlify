@@ -20,7 +20,7 @@ class Controller {
             'wp2static_deploy',
             [ $this, 'deploy' ],
             15,
-            1
+            2
         );
 
         add_action(

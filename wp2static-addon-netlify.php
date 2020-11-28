@@ -23,7 +23,7 @@ if ( file_exists( WP2STATIC_NETLIFY_PATH . 'vendor/autoload.php' ) ) {
     require WP2STATIC_NETLIFY_PATH . 'vendor/autoload.php';
 }
 
-function run_wp2static_addon_netlify() {
+function run_wp2static_addon_netlify() : void {
     $controller = new WP2StaticNetlify\Controller();
     $controller->run();
 }
