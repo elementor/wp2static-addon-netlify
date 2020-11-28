@@ -1,3 +1,8 @@
+## WP2Static Netlify Add-on 1.0
+
+ - don't attempt to deploy if addon not enabled in core
+
+
 ## WP2Static Netlify Add-on 1.0-alpha-007
 
  - Get add-on registered with WP2Static core

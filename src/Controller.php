@@ -132,7 +132,11 @@ class Controller {
         require_once __DIR__ . '/../views/netlify-page.php';
     }
 
-    public function deploy( string $processed_site_path ) : void {
+    public function deploy( string $processed_site_path, string $enabled_deployer ) : void {
+        if ( $enabled_deployer !== 'wp2static-addon-netlify' ) {
+            return;
+        }
+
         \WP2Static\WsLog::l( 'Starting Netlify deployment.' );
 
         $netlify_deployer = new Deployer();
