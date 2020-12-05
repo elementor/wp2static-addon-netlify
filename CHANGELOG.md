@@ -1,3 +1,7 @@
+## WP2Static Netlify Add-on 1.0.1
+
+ - fix CLI command registration in PHP 8
+
 ## WP2Static Netlify Add-on 1.0
 
  - don't attempt to deploy if addon not enabled in core
