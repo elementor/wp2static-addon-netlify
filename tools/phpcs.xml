@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <ruleset name="WP2Static">
   <description>WP2Static Project Coding Standard</description>
-  <config name="testVersion" value="7.3-"/>
+  <config name="testVersion" value="7.2-"/>
   <!--
     Note: Applied WP standard override to allow tabs instead
           of spaces, however, PHP CBF is using 4 spaces - Gray
@@ -11,6 +11,7 @@
   <arg name="colors" />
   <arg name="tab-width" value="2" />
   <!-- Custom line length validation -->
+  <rule ref="Squiz.PHP.DiscouragedFunctions" />
   <rule ref="Generic.Files.LineLength">
     <properties>
       <property name="lineLimit" value="100" />
@@ -47,6 +48,7 @@
   <rule ref="WordPress">
     <exclude name="Generic.CodeAnalysis.ForLoopWithTestFunctionCall.NotAllowed" />
     <exclude name="Generic.Commenting.DocComment.ShortNotCapital" />
+    <exclude name="Generic.Commenting.DocComment.MissingShort" />
     <exclude name="Generic.Formatting.MultipleStatementAlignment.NotSameWarning" />
     <exclude name="Generic.Functions.OpeningFunctionBraceKernighanRitchie.BraceOnNewLine" />
     <exclude name="Generic.PHP.NoSilencedErrors.Discouraged" />

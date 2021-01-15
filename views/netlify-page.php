@@ -1,3 +1,12 @@
+<?php
+// phpcs:disable Generic.Files.LineLength.MaxExceeded
+// phpcs:disable Generic.Files.LineLength.TooLong
+
+/**
+ * @var mixed[] $view
+ */
+?>
+
 <h2>Netlify Deployment Options</h2>
 
 <h3>Netlify</h3>
@@ -5,7 +14,7 @@
 <form
     name="wp2static-netlify-save-options"
     method="POST"
-    action="<?php echo esc_url( admin_url('admin-post.php') ); ?>">
+    action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 
     <?php wp_nonce_field( $view['nonce_action'] ); ?>
     <input name="action" type="hidden" value="wp2static_netlify_save_options" />
@@ -41,7 +50,7 @@
                     name="<?php echo $view['options']['accessToken']->name; ?>"
                     type="password"
                     value="<?php echo $view['options']['accessToken']->value !== '' ?
-                        \WP2Static\CoreOptions::encrypt_decrypt('decrypt', $view['options']['accessToken']->value) :
+                        \WP2Static\CoreOptions::encrypt_decrypt( 'decrypt', $view['options']['accessToken']->value ) :
                         ''; ?>"
                 />
             </td>
