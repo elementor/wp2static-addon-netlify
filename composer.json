@@ -29,6 +29,7 @@
         "phpunit/phpunit": "*",
         "dealerdirect/phpcodesniffer-composer-installer": "*",
         "wp-coding-standards/wpcs": "*",
+        "phpcompatibility/php-compatibility": "*",
         "php-parallel-lint/php-parallel-lint": "*",
         "wa72/url": "^0.7.1"
     },
